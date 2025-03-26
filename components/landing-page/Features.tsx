@@ -1,5 +1,5 @@
 import { featuresData } from "@/data/features";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent } from "../ui/card";
 
 const Features = () => {
   return (

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
 import Image from "next/image";
 import { ArrowUpRightIcon } from "lucide-react";
 import { ctaData } from "@/data/cta";
+import { Button } from "../ui/button";
 
 const CTA = () => {
   return (

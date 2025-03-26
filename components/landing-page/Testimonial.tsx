@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "../ui/card";
 import { testimonialsData } from "@/data/testimonials";
 
 const Testimonial = () => {

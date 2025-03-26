@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { LayoutGridIcon, PenBoxIcon } from "lucide-react";
+import { checkUser } from "@/lib/checkUser";
 
-const Header = () => {
+const Header = async () => {
+  await checkUser();
   return (
     <header className="bg-secondary/50 fixed top-0 z-50 w-full border-b backdrop-blur-md">
       <nav className="container mx-auto flex items-center justify-between p-4">

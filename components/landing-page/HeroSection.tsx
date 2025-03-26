@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowRightIcon } from "lucide-react";
-import { Button } from "./ui/button";
-import { LineChart } from "./Chart";
+import { Button } from "../ui/button";
+import { LineChart } from "../global/Chart";
 import Link from "next/link";
 
 const HeroSection = () => {

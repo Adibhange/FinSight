@@ -1,8 +1,9 @@
-import CTA from "@/components/CTA";
-import Features from "@/components/Features";
-import HeroSection from "@/components/HeroSection";
-import HowItWorks from "@/components/HowItWorks";
-import Testimonial from "@/components/Testimonial";
+import CTA from "@/components/landing-page/CTA";
+import Features from "@/components/landing-page/Features";
+import HeroSection from "@/components/landing-page/HeroSection";
+import HowItWorks from "@/components/landing-page/HowItWorks";
+import Testimonial from "@/components/landing-page/Testimonial";
+
 
 export default function Home() {
   return (
