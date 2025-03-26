@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "sonner";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
           >
             <Header />
             <main className="min-h-screen">{children}</main>
+            <Toaster richColors/>
             <Footer />
           </ThemeProvider>
         </body>
