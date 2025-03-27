@@ -10,20 +10,54 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { ArrowDownRightIcon, ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
-
-interface Account {
-  id: number;
-  name: string;
-  type: string;
-  balance: string;
-  isDefault: boolean;
-}
+import { Account } from "../page";
+import useFetch from "@/hooks/use-fetch";
+import { updateDefaultAccount } from "@/actions/accounts";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 type Props = {
   account: Account;
 };
 
 const AccountCard = ({ account }: Props) => {
+  const {
+    loading: updateDefaultLoading,
+    fn: updateDefaultFn,
+    data: updatedAccount,
+    error,
+  } = useFetch(updateDefaultAccount);
+
+  interface HandleDefaultChangeEvent
+    extends React.MouseEvent<HTMLButtonElement> {
+    preventDefault: () => void;
+  }
+
+  const handleDefaultChange = async (
+    e: HandleDefaultChangeEvent,
+  ): Promise<void> => {
+    e.preventDefault();
+
+    if (account.isDefault) {
+      toast.warning("You need atleast 1 default account");
+      return;
+    }
+
+    await updateDefaultFn(account.id);
+  };
+
+  useEffect(() => {
+    if (updatedAccount?.success) {
+      toast.success("Default account updated successfully");
+    }
+  }, [updatedAccount]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Failed to update default account");
+    }
+  }, [error]);
+
   return (
     <Card className="group relative transition-shadow hover:shadow-md">
       <Link href={`/account/${account.id}`}>
@@ -33,8 +67,8 @@ const AccountCard = ({ account }: Props) => {
           </CardTitle>
           <Switch
             checked={account.isDefault}
-            // onClick={handleDefaultChange}
-            // disabled={updateDefaultLoading}
+            onClick={handleDefaultChange}
+            disabled={!!updateDefaultLoading}
           />
         </CardHeader>
         <CardContent>

@@ -1,22 +1,10 @@
 "use server";
 
+import { serializeTransaction } from "@/app/lib/serializeTransactions";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { AccountType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-
-type PrismaModel = Record<string, any>;
-
-const serializeTransaction = (obj: PrismaModel): PrismaModel => {
-  if (!obj) return obj;
-
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [
-      key,
-      value instanceof Prisma.Decimal ? value.toNumber() : value,
-    ]),
-  );
-};
 
 type createAccountProps = {
   name: string;
@@ -73,6 +61,45 @@ export const createAccount = async (data: createAccountProps) => {
     return { success: true, data: serializedAccount };
   } catch (error) {
     console.error("Error creating account:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
+};
+
+export const getUserAccounts = async () => {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const accounts = await db.account.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: {
+            transactions: true,
+          },
+        },
+      },
+    });
+
+    // Serialize accounts before sending to client
+    const serializedAccounts = accounts.map(serializeTransaction);
+
+    return { success: true, data: serializedAccounts };
+  } catch (error) {
+    console.error("Error getting user account:", error);
     return {
       success: false,
       error:

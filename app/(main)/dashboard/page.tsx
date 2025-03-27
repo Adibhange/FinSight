@@ -4,27 +4,30 @@ import { PlusIcon } from "lucide-react";
 import AccountCard from "./_components/AccountCard";
 import BudgetInfo from "./_components/BudgetInfo";
 import DashboardSummary from "./_components/DashboardSummary";
+import { getUserAccounts } from "@/actions/dashboard";
 
-type Props = {};
+export type Account = {
+  id: string;
+  name: string;
+  type: string;
+  balance: string;
+  isDefault: boolean;
+};
 
-const accounts = [
-  {
-    id: 1,
-    name: "Addd",
-    type: "CURRENT",
-    balance: "124",
-    isDefault: true,
-  },
-  {
-    id: 2,
-    name: "Addd",
-    type: "CURRENT",
-    balance: "124",
-    isDefault: false,
-  },
-];
+const DashboardPage = async () => {
+  const accountsData = await getUserAccounts();
 
-const DashboardPage = (props: Props) => {
+  const accounts: Account[] =
+    accountsData.success && accountsData.data
+      ? accountsData.data.map((account) => ({
+          id: account.id,
+          name: account.name,
+          type: account.type,
+          balance: account.balance,
+          isDefault: account.isDefault,
+        }))
+      : [];
+
   return (
     <div className="space-y-8">
       <BudgetInfo />
@@ -41,7 +44,7 @@ const DashboardPage = (props: Props) => {
           </Card>
         </CreateAccount>
 
-        {accounts.map((account) => (
+        {accounts?.map((account) => (
           <AccountCard key={account.id} account={account} />
         ))}
       </div>
