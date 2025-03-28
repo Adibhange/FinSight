@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Account, Transaction, User } from "@prisma/client";
 
-type PrismaModel = Record<string, any>;
+export type PrismaModel = Record<string, any>;
 
 export const serializeTransaction = (obj: PrismaModel): PrismaModel => {
   if (!obj) return obj;

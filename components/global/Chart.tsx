@@ -1,6 +1,6 @@
 "use client";
 
-import { Cell, Line, Pie, PieChart } from "recharts";
+import { Bar, BarChart, Cell, Line, Pie, PieChart } from "recharts";
 import {
   XAxis,
   YAxis,
@@ -126,6 +126,58 @@ export const PieChartComponent: React.FC<PieChartProps> = ({ data }) => {
           </PieChart>
         </ResponsiveContainer>
       )}
+    </div>
+  );
+};
+
+interface BarChartProps {
+  data: ChartData[];
+}
+
+export const BarChartComponent: React.FC<BarChartProps> = ({ data }) => {
+  return (
+    <div className="h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis
+            dataKey="date"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `$${value}`}
+          />
+          <Tooltip
+            formatter={(value) => [`$${value}`, undefined]}
+            contentStyle={{
+              backgroundColor: "var(--color-popover)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-sm)",
+            }}
+          />
+          <Legend />
+          <Bar
+            dataKey="income"
+            name="Income"
+            fill="#22c55e"
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="expense"
+            name="Expense"
+            fill="#ef4444"
+            radius={[4, 4, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };
