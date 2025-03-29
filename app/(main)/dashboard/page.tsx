@@ -5,6 +5,7 @@ import AccountCard from "./_components/AccountCard";
 import BudgetInfo from "./_components/BudgetInfo";
 import DashboardSummary from "./_components/DashboardSummary";
 import { getUserAccounts } from "@/actions/dashboard";
+import { getCurrentBudget } from "@/actions/budget";
 
 export type Account = {
   id: string;
@@ -28,9 +29,21 @@ const DashboardPage = async () => {
         }))
       : [];
 
+  const defaultAccount = accounts?.find((account) => account.isDefault);
+
+  let budgetData = null;
+  if (defaultAccount) {
+    budgetData = await getCurrentBudget(defaultAccount.id);
+  }
+
   return (
     <div className="space-y-8">
-      <BudgetInfo />
+      {budgetData && (
+        <BudgetInfo
+          initialBudget={budgetData?.budget}
+          currentExpenses={budgetData?.currentExpenses || 0}
+        />
+      )}
 
       <DashboardSummary />
 
