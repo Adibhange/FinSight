@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import ReceiptScanner from "./ReceiptScanner";
 
 type Props = {
   accounts: Account[];
@@ -80,6 +81,28 @@ const TransactionForm = ({ accounts, categories }: Props) => {
     transactionFn(formData);
   };
 
+  interface ScannedData {
+    amount: number;
+    date: string;
+    description?: string;
+    category?: string;
+  }
+
+  const handleScanComplete = (scannedData: ScannedData) => {
+    console.log(scannedData);
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+      toast.success("Receipt scanned successfully");
+    }
+  };
+
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
       toast.success("Transaction created successfully");
@@ -99,6 +122,8 @@ const TransactionForm = ({ accounts, categories }: Props) => {
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+      <ReceiptScanner onScanComplete={handleScanComplete} />
+
       <div className="space-y-2">
         <Label className="text-sm font-medium">Type</Label>
         <Select
@@ -170,6 +195,7 @@ const TransactionForm = ({ accounts, categories }: Props) => {
       <div className="space-y-2">
         <Label className="text-sm font-medium">Category</Label>
         <Select
+          value={watch("category")}
           onValueChange={(value) => setValue("category", value)}
           defaultValue={getValues("category")}
         >
