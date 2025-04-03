@@ -1,6 +1,7 @@
 "use client";
 
-import { format } from "date-fns";
+import { TransactionInterface } from "@/actions/transaction";
+import { PieChartComponent } from "@/components/global/Chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -10,48 +11,57 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import { ArrowDownRightIcon, ArrowUpRightIcon } from "lucide-react";
-import { PieChartComponent } from "@/components/global/Chart";
+import { useState } from "react";
+import { Account } from "../page";
 
-type Props = {};
+type Props = {
+  accounts: Account[];
+  transactions: TransactionInterface[];
+};
 
-const recentTransactions = [
-  {
-    id: 1,
-    description: "",
-    date: 20251302,
-    type: "",
-    amount: 12,
-  },
-  {
-    id: 2,
-    description: "",
-    date: 20451215,
-    type: "EXPENSE",
-    amount: 12,
-  },
-];
+const DashboardSummary = ({ accounts, transactions }: Props) => {
+  const [selectedAccountId, setSelectedAccountId] = useState(
+    accounts.find((a) => a.isDefault)?.id || accounts[0]?.id,
+  );
 
-const pieChartData = [
-  {
-    name: "Netflix",
-    value: 10,
-  },
-  {
-    name: "Amazon",
-    value: 15,
-  },
-  {
-    name: "Shopping",
-    value: 150,
-  },
-  {
-    name: "Movie",
-    value: 45,
-  },
-];
+  const accountTransactions = transactions.filter(
+    (t) => t.accountId === selectedAccountId,
+  );
 
-const DashboardSummary = (props: Props) => {
+  const recentTransactions = accountTransactions
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
+  const currentDate = new Date();
+  const currentMonthExpenses = accountTransactions.filter((t) => {
+    const transactionDate = new Date(t.date);
+    return (
+      t.type === "EXPENSE" &&
+      transactionDate.getMonth() === currentDate.getMonth() &&
+      transactionDate.getFullYear() === currentDate.getFullYear()
+    );
+  });
+
+  const expensesByCategory = currentMonthExpenses.reduce<
+    Record<string, number>
+  >((acc, transaction) => {
+    const category = transaction.category;
+    if (!acc[category]) {
+      acc[category] = 0;
+    }
+    acc[category] = (acc[category] || 0) + Number(transaction.amount);
+    return acc;
+  }, {});
+
+  const pieChartData = Object.entries(expensesByCategory).map(
+    ([category, amount]) => ({
+      name: category,
+      value: amount,
+    }),
+  );
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
@@ -59,12 +69,19 @@ const DashboardSummary = (props: Props) => {
           <CardTitle className="text-base font-normal">
             Recent Transactions
           </CardTitle>
-          <Select>
+          <Select
+            value={selectedAccountId}
+            onValueChange={setSelectedAccountId}
+          >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Select account" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="personal">Personal</SelectItem>
+              {accounts.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </CardHeader>
@@ -85,7 +102,7 @@ const DashboardSummary = (props: Props) => {
                       {transaction.description || "Untitled Transaction"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      {format(new Date(transaction.date), "PP")}
+                      {format(new Date(transaction.date), "PPP")}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -102,7 +119,7 @@ const DashboardSummary = (props: Props) => {
                       ) : (
                         <ArrowUpRightIcon className="mr-1 h-4 w-4" />
                       )}
-                      ${transaction.amount.toFixed(2)}
+                      ${Number(transaction.amount).toFixed(2)}
                     </div>
                   </div>
                 </div>

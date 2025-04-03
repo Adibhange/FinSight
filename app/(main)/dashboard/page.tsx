@@ -1,11 +1,12 @@
+import { getCurrentBudget } from "@/actions/budget";
+import { getDashboardData, getUserAccounts } from "@/actions/dashboard";
+import { TransactionInterface } from "@/actions/transaction";
 import CreateAccount from "@/components/global/CreateAccount";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlusIcon } from "lucide-react";
 import AccountCard from "./_components/AccountCard";
 import BudgetInfo from "./_components/BudgetInfo";
 import DashboardSummary from "./_components/DashboardSummary";
-import { getUserAccounts } from "@/actions/dashboard";
-import { getCurrentBudget } from "@/actions/budget";
 
 export type Account = {
   id: string;
@@ -17,6 +18,7 @@ export type Account = {
 
 const DashboardPage = async () => {
   const accountsData = await getUserAccounts();
+  const transactions = await getDashboardData();
 
   const accounts: Account[] =
     accountsData.success && accountsData.data
@@ -45,7 +47,10 @@ const DashboardPage = async () => {
         />
       )}
 
-      <DashboardSummary />
+      <DashboardSummary
+        accounts={accounts}
+        transactions={(transactions as TransactionInterface[]) || []}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CreateAccount>
